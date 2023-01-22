@@ -1,0 +1,17 @@
+{% extends 'base.j2' %}
+{% block title %}Survey Questions{% endblock %}
+{% block content %}
+<h1>Survey Form</h1>
+<p>{{responseLen}}</p>
+<form action="/answer" method="POST">
+<label>{{question.question}}</label>
+{% if question.choices %}
+{% for choice in question.choices %}
+<input type="radio" name="answer">{{choice}}</input>
+{% endfor %}
+{% endif %}
+<button>Submit</button>
+</form>
+
+
+{% endblock %}

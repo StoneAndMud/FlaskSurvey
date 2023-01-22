@@ -1,0 +1,11 @@
+{% extends 'base.j2' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1>Home Page</h1>
+<h2>This is the home page</h2>
+<form action="/questions/0">
+<p>{{survey_title}}</p>
+<p>{{survey_instructions}}</p>
+<button>Begin Survey</button>
+</form>
+{% endblock %}
