@@ -6,7 +6,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "survey123"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
-RESPONSES = []
+RESPONSES_KEY = "responses"
 
 
 @app.route('/')
@@ -19,23 +19,26 @@ def home_page():
 @app.route('/questions/<int:number>')
 def do_form(number):
     question = satisfaction_survey.questions[number]
-    response_len = len(RESPONSES)
+    responses = session.get(RESPONSES_KEY)
+    response_len = len(responses)
 
-    if response_len is None:
+    if responses is None:
         return redirect("/")
     if response_len == len(satisfaction_survey.questions):
         return redirect("/thanks")
     if response_len != number:
         return redirect(f"/questions/{response_len}")
 
-    return render_template('questions.j2', question=question, number=number)
+    return render_template('questions.j2', question=question, number=number, responses=responses)
 
 
 @app.route("/answer", methods=["POST"])
 def add_answer():
     answer = request.form['answer']
-    response_len = len(RESPONSES)
-    RESPONSES.append(answer)
+    responses = session[RESPONSES_KEY]
+    responses.append(answer)
+    session[RESPONSES_KEY] = responses
+    response_len = len(responses)
 
     if (response_len == len(satisfaction_survey.questions)):
         return redirect("/thanks")
@@ -46,3 +49,9 @@ def add_answer():
 @app.route("/thanks")
 def finish_survey():
     return render_template("thank-you.j2")
+
+
+@app.route("/start", methods=["POST"])
+def clear_session():
+    session[RESPONSES_KEY] = []
+    return redirect("/questions/0")
